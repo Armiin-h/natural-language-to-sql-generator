@@ -1,0 +1,30 @@
+:root {
+  --bg: #f3f7f5;
+  --ink: #14231c;
+  --muted: #5a6f64;
+  --accent: #0d7a4f;
+  --surface: #ffffff;
+  --line: #c9d8d0;
+  --danger: #b42318;
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "Manrope", "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-body);
+  color: var(--ink);
+  background:
+    radial-gradient(ellipse 70% 45% at 10% -5%, #c8e6d8 0%, transparent 55%),
+    radial-gradient(ellipse 50% 35% at 95% 5%, #d5e4f0 0%, transparent 50%),
+    linear-gradient(180deg, #eef5f1 0%, var(--bg) 40%);
+}
+
+#root {
+  min-height: 100vh;
+}
