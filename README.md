@@ -62,6 +62,15 @@ npm run dev
 | OpenAPI docs | http://localhost:8000/docs |
 | UI (Vite) | http://localhost:5173 |
 | Health | http://localhost:8000/health |
+| Schema | http://localhost:8000/schema |
+
+On API startup the sample ecommerce SQLite DB is created and seeded automatically.
+To rebuild it from scratch:
+
+```bash
+cd backend
+python -m scripts.init_db --reset
+```
 
 Keep `OLLAMA_BASE_URL=http://localhost:11434` for host runs. Compose forces
 `host.docker.internal` inside the API container.
@@ -79,10 +88,22 @@ docker compose up --build
 | UI | http://localhost:3000 |
 | API | http://localhost:8000 |
 
+## Sample database
+
+SQLite schema under `backend/data/ecommerce.db`:
+
+| Table | Purpose |
+|-------|---------|
+| `categories` | Product categories |
+| `products` | Catalog with price and stock |
+| `customers` | Buyers |
+| `orders` | Order headers (date, status) |
+| `order_items` | Line items with quantity and unit price |
+
 ## Project layout
 
 ```text
-backend/          FastAPI app
+backend/          FastAPI app + DB models/seed/introspect
 frontend/         React + Vite UI
 docs/             Architecture notes
 docker-compose.yml
@@ -90,8 +111,8 @@ docker-compose.yml
 
 ## Current status
 
-Day 1 scaffold: settings, `/health`, React shell, Docker stubs. Database seeding,
-SQL agent, and query UI follow in later commits.
+Day 2: sample ecommerce schema, seed script, schema introspection, `/schema`
+endpoint. SQL agent and query UI follow next.
 
 ## License
 

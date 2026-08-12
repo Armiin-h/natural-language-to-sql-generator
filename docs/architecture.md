@@ -10,7 +10,7 @@ structured JSON for an HTML table in the UI.
 ```text
 ┌────────────────────┐      JSON       ┌──────────────────────────┐
 │  React (Vite) UI   │ ──────────────► │  FastAPI                 │
-│  AskSQL            │ ◄────────────── │  /health (Day 1)         │
+│  AskSQL            │ ◄────────────── │  /health, /schema        │
 │  question + table  │                 │  /query  (later)         │
 └────────────────────┘                 └────────────┬─────────────┘
                                                     │
@@ -22,21 +22,29 @@ structured JSON for an HTML table in the UI.
                      │              ┌───────────────┴───────────────┐              │
                      │              ▼                               ▼              │
                      │     SQLite ecommerce.db                 ChatOllama          │
-                     │     (sample schema)                     (local Ollama)      │
+                     │     categories/products/…               (local Ollama)      │
                      └─────────────────────────────────────────────────────────────┘
 ```
 
-## Day 1 status
+## Sample schema (Day 2)
 
-- FastAPI app with `/health` and settings from `.env`
-- React shell that polls API health
-- Docker Compose stubs for `api` + `frontend` (Ollama on the host)
+```text
+categories 1──* products 1──* order_items *──1 orders *──1 customers
+```
+
+- Seeded on API startup (`ensure_database`) and via `python -m scripts.init_db`
+- `GET /schema` returns columns, FKs, sample rows, and prompt-ready text
+- Introspection helpers feed the upcoming SQL agent system prompt
+
+## Status
+
+- Day 1: FastAPI `/health`, React shell, Compose stubs
+- Day 2: ORM models, seed data, introspection, `/schema`
 
 ## Upcoming
 
 | Day | Focus |
 |-----|--------|
-| 2 | Sample DB schema + seed |
 | 3 | SQL agent core |
 | 4 | Safety guards + retries |
 | 5 | `/query` API |
