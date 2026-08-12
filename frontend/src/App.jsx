@@ -40,7 +40,7 @@ export default function App() {
         <p className="brand">AskSQL</p>
         <h1>Ask your database in English</h1>
         <p className="lede">
-          Scaffold is up. Query generation and results land in upcoming days.
+          Sample ecommerce database is seeded. Query generation and results land next.
         </p>
       </header>
 
@@ -52,24 +52,36 @@ export default function App() {
           </p>
         )}
         {health && !healthError && (
-          <dl className="status-grid">
-            <div>
-              <dt>Status</dt>
-              <dd>{health.status}</dd>
-            </div>
-            <div>
-              <dt>Model</dt>
-              <dd>{health.ollama_model}</dd>
-            </div>
-            <div>
-              <dt>Database</dt>
-              <dd>{health.database}</dd>
-            </div>
-            <div>
-              <dt>Row limit</dt>
-              <dd>{health.sql_row_limit}</dd>
-            </div>
-          </dl>
+          <>
+            <dl className="status-grid">
+              <div>
+                <dt>Status</dt>
+                <dd>{health.status}</dd>
+              </div>
+              <div>
+                <dt>Model</dt>
+                <dd>{health.ollama_model}</dd>
+              </div>
+              <div>
+                <dt>Database</dt>
+                <dd>{health.database}</dd>
+              </div>
+              <div>
+                <dt>Tables ready</dt>
+                <dd>{health.tables_ready ? "yes" : "no"}</dd>
+              </div>
+            </dl>
+            {health.table_counts && (
+              <dl className="status-grid counts">
+                {Object.entries(health.table_counts).map(([table, count]) => (
+                  <div key={table}>
+                    <dt>{table}</dt>
+                    <dd>{count}</dd>
+                  </div>
+                ))}
+              </dl>
+            )}
+          </>
         )}
         {!health && !healthError && <p className="status-pending">Checking API…</p>}
       </section>
