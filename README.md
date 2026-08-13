@@ -17,7 +17,7 @@ Example: *"Show the top 5 products by sales"* → generated `SELECT` → results
 
 | Layer | Technology |
 |-------|------------|
-| LLM | Ollama (default `qwen2.5-coder`) |
+| LLM | Ollama (default `llama3.2`, tool-calling required) |
 | Agent | LangChain / LangGraph SQL agent |
 | Database | SQLite |
 | Backend | FastAPI |
@@ -30,11 +30,11 @@ See [docs/architecture.md](docs/architecture.md) for the request path and Docker
 
 - Python 3.11+
 - Node.js 20+
-- [Ollama](https://ollama.com/) with a coding-capable chat model (used from Day 3)
+- [Ollama](https://ollama.com/) with a coding-capable chat model
 - Docker Desktop (optional)
 
 ```bash
-ollama pull qwen2.5-coder
+ollama pull llama3.2
 ```
 
 ## Quick start (local)
@@ -64,6 +64,8 @@ npm run dev
 | Health | http://localhost:8000/health |
 | Schema | http://localhost:8000/schema |
 
+### Sample database
+
 On API startup the sample ecommerce SQLite DB is created and seeded automatically.
 To rebuild it from scratch:
 
@@ -71,6 +73,19 @@ To rebuild it from scratch:
 cd backend
 python -m scripts.init_db --reset
 ```
+
+### Ask via CLI (SQL agent)
+
+With Ollama running and a **tool-capable** model pulled (default `llama3.2`):
+
+```bash
+cd backend
+python -m scripts.ask "Show the top 5 products by sales"
+python -m scripts.ask --verbose --json "How many customers live in USA?"
+```
+
+`/health` reports `ollama_reachable`. Prefer models that support Ollama tools;
+plain text “JSON tool call” models will not drive the ReAct loop correctly.
 
 Keep `OLLAMA_BASE_URL=http://localhost:11434` for host runs. Compose forces
 `host.docker.internal` inside the API container.
@@ -103,7 +118,7 @@ SQLite schema under `backend/data/ecommerce.db`:
 ## Project layout
 
 ```text
-backend/          FastAPI app + DB models/seed/introspect
+backend/          FastAPI app, DB layer, SQL agent
 frontend/         React + Vite UI
 docs/             Architecture notes
 docker-compose.yml
@@ -111,8 +126,8 @@ docker-compose.yml
 
 ## Current status
 
-Day 2: sample ecommerce schema, seed script, schema introspection, `/schema`
-endpoint. SQL agent and query UI follow next.
+Day 3: LangGraph ReAct SQL agent (Ollama + SQLDatabaseToolkit) and
+`python -m scripts.ask` CLI. Safety hardening and `/query` API come next.
 
 ## License
 
