@@ -23,16 +23,18 @@ class Settings(BaseSettings):
     )
 
     ollama_base_url: str = "http://localhost:11434"
-    ollama_model: str = "qwen2.5-coder"
+    # Tool-calling chat model required (llama3.2 works locally; coder models preferred when they support tools)
+    ollama_model: str = "llama3.2"
     database_url: str = "sqlite:///./data/ecommerce.db"
 
     api_host: str = "0.0.0.0"
     api_port: int = 8000
     cors_origins: str = "http://localhost:5173,http://localhost:3000"
 
-    # Safety defaults (wired up in later days)
+    # Safety defaults (wired up more fully on Day 4)
     sql_row_limit: int = 100
     sql_timeout_seconds: float = 10.0
+    agent_recursion_limit: int = 25
 
     @property
     def cors_origin_list(self) -> list[str]:

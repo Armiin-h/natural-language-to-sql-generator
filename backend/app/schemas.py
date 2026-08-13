@@ -13,7 +13,9 @@ class HealthResponse(BaseModel):
     database: str
     sql_row_limit: int
     sql_timeout_seconds: float
+    agent_recursion_limit: int = 25
     tables_ready: bool = False
+    ollama_reachable: bool = False
     table_counts: dict[str, int] = Field(default_factory=dict)
 
 

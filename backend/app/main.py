@@ -6,6 +6,7 @@ from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.engine import Engine
 
+from app.agent.sql_agent import ollama_reachable
 from app.config import get_settings
 from app.db.engine import create_db_engine
 from app.db.introspect import schema_as_dicts, schema_prompt_text
@@ -41,7 +42,7 @@ app = FastAPI(
         "Ask questions in English; a local SQL agent generates and runs "
         "read-only queries against a sample SQLite database."
     ),
-    version="0.2.0",
+    version="0.3.0",
     lifespan=lifespan,
 )
 
@@ -64,12 +65,14 @@ def health() -> HealthResponse:
     return HealthResponse(
         status="ok",
         service="nl-to-sql-api",
-        version="0.2.0",
+        version="0.3.0",
         ollama_model=settings.ollama_model,
         database=settings.sqlite_path.name,
         sql_row_limit=settings.sql_row_limit,
         sql_timeout_seconds=settings.sql_timeout_seconds,
+        agent_recursion_limit=settings.agent_recursion_limit,
         tables_ready=ready,
+        ollama_reachable=ollama_reachable(settings),
         table_counts=counts,
     )
 

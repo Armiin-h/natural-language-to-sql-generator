@@ -9,11 +9,12 @@ services:
     environment:
       # Always reach host Ollama from the container (ignore local .env localhost)
       OLLAMA_BASE_URL: http://host.docker.internal:11434
-      OLLAMA_MODEL: ${OLLAMA_MODEL:-qwen2.5-coder}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000,http://localhost:5173}
       DATABASE_URL: sqlite:///./data/ecommerce.db
       SQL_ROW_LIMIT: ${SQL_ROW_LIMIT:-100}
       SQL_TIMEOUT_SECONDS: ${SQL_TIMEOUT_SECONDS:-10}
+      AGENT_RECURSION_LIMIT: ${AGENT_RECURSION_LIMIT:-25}
     volumes:
       - sql_data:/app/data
     extra_hosts:
