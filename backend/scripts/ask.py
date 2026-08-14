@@ -48,17 +48,29 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.json:
         print(json.dumps(result.to_dict(), indent=2))
-        return 0
+        return 0 if result.success else 1
 
     print(f"Question: {result.question}")
     print(f"Model:    {result.model}")
     print(f"Database: {result.database}")
-    if result.sql_queries:
-        print("SQL:")
+    print(f"Success:  {result.success} (attempts={result.attempts})")
+    if result.final_sql:
+        print(f"SQL:      {result.final_sql}")
+    elif result.sql_queries:
+        print("SQL candidates:")
         for sql in result.sql_queries:
             print(f"  {sql}")
     else:
-        print("SQL: (none captured)")
+        print("SQL:      (none captured)")
+    if result.error:
+        print(f"Error:    {result.error}")
+    if result.columns:
+        print(f"Columns:  {', '.join(result.columns)}")
+        print(f"Rows ({result.row_count}):")
+        for row in result.rows[:20]:
+            print(f"  {row}")
+        if result.truncated:
+            print("  … truncated")
     print("Answer:")
     print(result.answer or "(empty)")
 
@@ -67,9 +79,10 @@ def main(argv: list[str] | None = None) -> int:
         for index, step in enumerate(result.steps, start=1):
             label = step.get("name") or step.get("kind")
             content = (step.get("content") or "")[:240]
-            print(f"  {index}. [{step.get('kind')}] {label}: {content}")
+            attempt = step.get("attempt")
+            print(f"  {index}. [a{attempt}] [{step.get('kind')}] {label}: {content}")
 
-    return 0
+    return 0 if result.success else 1
 
 
 if __name__ == "__main__":
