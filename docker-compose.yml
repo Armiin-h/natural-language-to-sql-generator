@@ -15,6 +15,7 @@ services:
       SQL_ROW_LIMIT: ${SQL_ROW_LIMIT:-100}
       SQL_TIMEOUT_SECONDS: ${SQL_TIMEOUT_SECONDS:-10}
       AGENT_RECURSION_LIMIT: ${AGENT_RECURSION_LIMIT:-25}
+      SQL_MAX_ATTEMPTS: ${SQL_MAX_ATTEMPTS:-2}
     volumes:
       - sql_data:/app/data
     extra_hosts:

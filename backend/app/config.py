@@ -31,10 +31,11 @@ class Settings(BaseSettings):
     api_port: int = 8000
     cors_origins: str = "http://localhost:5173,http://localhost:3000"
 
-    # Safety defaults (wired up more fully on Day 4)
+    # Safety / agent defaults
     sql_row_limit: int = 100
     sql_timeout_seconds: float = 10.0
     agent_recursion_limit: int = 25
+    sql_max_attempts: int = 2
 
     @property
     def cors_origin_list(self) -> list[str]:

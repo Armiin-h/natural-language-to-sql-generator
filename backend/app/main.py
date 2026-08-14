@@ -42,7 +42,7 @@ app = FastAPI(
         "Ask questions in English; a local SQL agent generates and runs "
         "read-only queries against a sample SQLite database."
     ),
-    version="0.3.0",
+    version="0.4.0",
     lifespan=lifespan,
 )
 
@@ -65,12 +65,13 @@ def health() -> HealthResponse:
     return HealthResponse(
         status="ok",
         service="nl-to-sql-api",
-        version="0.3.0",
+        version="0.4.0",
         ollama_model=settings.ollama_model,
         database=settings.sqlite_path.name,
         sql_row_limit=settings.sql_row_limit,
         sql_timeout_seconds=settings.sql_timeout_seconds,
         agent_recursion_limit=settings.agent_recursion_limit,
+        sql_max_attempts=settings.sql_max_attempts,
         tables_ready=ready,
         ollama_reachable=ollama_reachable(settings),
         table_counts=counts,
