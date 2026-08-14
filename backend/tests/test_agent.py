@@ -118,8 +118,12 @@ def test_ask_database_with_stub_agent(tmp_path: Path, monkeypatch: pytest.Monkey
         agent=StubAgent(),
     )
     assert isinstance(result, SqlAgentResult)
+    assert result.success is True
     assert result.answer == "There are 10 products."
-    assert result.sql_queries == ["SELECT COUNT(*) AS n FROM products"]
+    assert result.final_sql is not None
+    assert "COUNT(*)" in result.final_sql.upper()
+    assert result.row_count == 1
+    assert result.rows[0][0] == 10
     assert result.database == "ask.db"
     get_settings.cache_clear()
 
@@ -133,4 +137,32 @@ def test_build_sql_database_lists_tables(tmp_path: Path, monkeypatch: pytest.Mon
     db = build_sql_database(settings)
     names = set(db.get_usable_table_names())
     assert names == {"categories", "customers", "order_items", "orders", "products"}
+    get_settings.cache_clear()
+
+
+def test_safe_query_tool_rejects_delete(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    db_path = tmp_path / "tool.db"
+    monkeypatch.setenv("DATABASE_URL", f"sqlite:///{db_path.as_posix()}")
+    get_settings.cache_clear()
+    settings = get_settings()
+    ensure_database(settings.sqlite_path, reset=True)
+
+    from langchain_community.agent_toolkits import SQLDatabaseToolkit
+    from langchain_core.language_models.fake_chat_models import FakeListChatModel
+
+    from app.agent.tools import build_safe_sql_tools
+    from app.db.engine import create_db_engine
+
+    llm = FakeListChatModel(responses=["ok"])
+    engine = create_db_engine(settings)
+    db = build_sql_database(settings, engine=engine)
+    toolkit = SQLDatabaseToolkit(db=db, llm=llm)
+    tools = {
+        tool.name: tool
+        for tool in build_safe_sql_tools(toolkit=toolkit, engine=engine, settings=settings)
+    }
+    query_tool = tools["sql_db_query"]
+    output = query_tool.invoke({"query": "DELETE FROM products"})
+    assert "Error" in output
+    assert "Blocked" in output or "read-only" in output.lower()
     get_settings.cache_clear()

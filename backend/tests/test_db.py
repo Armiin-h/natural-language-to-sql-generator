@@ -86,8 +86,9 @@ def test_schema_and_health_endpoints(tmp_path: Path, monkeypatch: pytest.MonkeyP
         body = health.json()
         assert body["tables_ready"] is True
         assert body["table_counts"]["products"] == 10
-        assert body["version"] == "0.3.0"
+        assert body["version"] == "0.4.0"
         assert "ollama_reachable" in body
+        assert "sql_max_attempts" in body
 
     get_settings.cache_clear()
     main_module._engine = None
