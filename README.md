@@ -4,15 +4,14 @@
 
 Example: *"Show the top 5 products by sales"* → generated `SELECT` → results table.
 
-## Features (roadmap)
+## Features
 
 - Local LLM via Ollama driving a LangGraph / LangChain SQL agent
-- Schema-aware tools (list tables, inspect schema, run query, check SQL)
-- Read-only safety checks before execution
-- FastAPI backend + React UI (SQL panel + results table)
+- Schema-aware tools (list tables, inspect schema, check SQL, run query)
+- **Code-enforced** read-only safety (SELECT-only, LIMIT caps, timeouts, retries)
+- FastAPI backend + React UI (SQL panel + results table — query UI next)
 - Sample SQLite ecommerce schema
-- Execution-accuracy evaluation set
-
+- Execution-accuracy evaluation set (upcoming)
 ## Stack
 
 | Layer | Technology |
@@ -126,8 +125,8 @@ docker-compose.yml
 
 ## Current status
 
-Day 3: LangGraph ReAct SQL agent (Ollama + SQLDatabaseToolkit) and
-`python -m scripts.ask` CLI. Safety hardening and `/query` API come next.
+Day 4: SELECT-only validation, LIMIT/timeouts, error-driven retries, and
+structured SQL/rows results from `ask_database` / `scripts.ask`. Next: `/query` API.
 
 ## License
 

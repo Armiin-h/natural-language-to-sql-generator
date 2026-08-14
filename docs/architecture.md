@@ -17,16 +17,30 @@ health/schema today; the query HTTP route lands next.
                      ┌──────────────────────────────┼──────────────────────────────┐
                      │                              ▼                              │
                      │              SQL Agent (create_react_agent)                 │
-                     │         sql_db_list_tables / schema / query / checker       │
+                     │         list / schema / checker / safe sql_db_query         │
                      │                              │                              │
                      │              ┌───────────────┴───────────────┐              │
                      │              ▼                               ▼              │
-                     │     SQLite ecommerce.db                 ChatOllama          │
-                     │     categories/products/…               (local Ollama)      │
+                     │     Safety + executor                   ChatOllama          │
+                     │     SELECT-only, LIMIT, timeout         (local Ollama)      │
+                     │              │                                              │
+                     │              ▼                                              │
+                     │     SQLite ecommerce.db                                     │
                      └─────────────────────────────────────────────────────────────┘
 ```
 
-CLI path (Day 3): `python -m scripts.ask "…"`.
+CLI path: `python -m scripts.ask "…"` returns structured success/SQL/rows/error.
+
+## Safety (Day 4)
+
+| Control | Enforcement |
+|---------|-------------|
+| SELECT / WITH / EXPLAIN only | `validate_sql` before execution |
+| Block DML/DDL | Regex on comment-stripped SQL |
+| Single statement | Reject multi-statement batches |
+| Row cap | Inject/cap `LIMIT` via `sql_row_limit` |
+| Timeout | SQLite progress handler + busy_timeout |
+| Retries | Re-invoke agent with prior error (`sql_max_attempts`) |
 
 ## Sample schema (Day 2)
 
@@ -36,19 +50,18 @@ categories 1──* products 1──* order_items *──1 orders *──1 custo
 
 - Seeded on API startup (`ensure_database`) and via `python -m scripts.init_db`
 - `GET /schema` returns columns, FKs, sample rows, and prompt-ready text
-- Agent system prompt enforces read-only SELECT behavior (code guards on Day 4)
 
 ## Status
 
 - Day 1: FastAPI `/health`, React shell, Compose stubs
 - Day 2: ORM models, seed data, introspection, `/schema`
 - Day 3: Ollama + LangGraph SQL agent, `scripts/ask.py`
+- Day 4: Code-enforced safety, structured rows, error-driven retries
 
 ## Upcoming
 
 | Day | Focus |
 |-----|--------|
-| 4 | Safety guards + retries |
 | 5 | `/query` API |
 | 6 | Full query UI |
 | 7 | Execution-accuracy eval |
