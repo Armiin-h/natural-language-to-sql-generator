@@ -4,14 +4,17 @@
 
 Example: *"Show the top 5 products by sales"* → generated `SELECT` → results table.
 
+[![CI](https://github.com/Armiin-h/natural-language-to-sql-generator/actions/workflows/ci.yml/badge.svg)](https://github.com/Armiin-h/natural-language-to-sql-generator/actions/workflows/ci.yml)
+
 ## Features
 
 - Local LLM via Ollama driving a LangGraph / LangChain SQL agent
 - Schema-aware tools (list tables, inspect schema, check SQL, run query)
-- **Code-enforced** read-only safety (SELECT-only, LIMIT caps, timeouts, retries)
-- FastAPI backend + React UI (SQL panel + results table — query UI next)
-- Sample SQLite ecommerce schema
-- Execution-accuracy evaluation set (upcoming)
+- Code-enforced read-only safety (SELECT-only, LIMIT caps, timeouts, retries)
+- FastAPI `POST /query` + React UI (SQL panel + results table)
+- Sample SQLite ecommerce schema with seed/reset scripts
+- Labeled eval set scored by **execution accuracy**
+
 ## Stack
 
 | Layer | Technology |
@@ -22,14 +25,15 @@ Example: *"Show the top 5 products by sales"* → generated `SELECT` → results
 | Backend | FastAPI |
 | Frontend | React + Vite |
 | Deploy | Docker Compose |
+| CI | GitHub Actions |
 
-See [docs/architecture.md](docs/architecture.md) for the request path and Docker topology.
+See [docs/architecture.md](docs/architecture.md) and [docs/demo.md](docs/demo.md).
 
 ## Prerequisites
 
 - Python 3.11+
 - Node.js 20+
-- [Ollama](https://ollama.com/) with a coding-capable chat model
+- [Ollama](https://ollama.com/) with a tool-capable chat model
 - Docker Desktop (optional)
 
 ```bash
@@ -62,38 +66,37 @@ npm run dev
 | UI (Vite) | http://localhost:5173 |
 | Health | http://localhost:8000/health |
 | Schema | http://localhost:8000/schema |
+| Query | `POST /query` |
 
 ### Sample database
 
 On API startup the sample ecommerce SQLite DB is created and seeded automatically.
-To rebuild it from scratch:
 
 ```bash
 cd backend
 python -m scripts.init_db --reset
 ```
 
-### Ask via CLI (SQL agent)
-
-With Ollama running and a **tool-capable** model pulled (default `llama3.2`):
+### Ask via CLI
 
 ```bash
 cd backend
 python -m scripts.ask "Show the top 5 products by sales"
-python -m scripts.ask --verbose --json "How many customers live in USA?"
 ```
 
-`/health` reports `ollama_reachable`. Prefer models that support Ollama tools;
-plain text “JSON tool call” models will not drive the ReAct loop correctly.
+### Evaluate
 
-Keep `OLLAMA_BASE_URL=http://localhost:11434` for host runs. Compose forces
-`host.docker.internal` inside the API container.
+```bash
+cd backend
+python -m scripts.eval_accuracy --gold-only
+python -m scripts.eval_accuracy --agent --limit 10
+```
 
 ## Docker Compose
 
 ```bash
 cp .env.example .env
-# Ensure Ollama is running on the host (needed once the agent lands)
+# Ensure Ollama is running on the host
 docker compose up --build
 ```
 
@@ -103,8 +106,6 @@ docker compose up --build
 | API | http://localhost:8000 |
 
 ## Sample database
-
-SQLite schema under `backend/data/ecommerce.db`:
 
 | Table | Purpose |
 |-------|---------|
@@ -117,16 +118,11 @@ SQLite schema under `backend/data/ecommerce.db`:
 ## Project layout
 
 ```text
-backend/          FastAPI app, DB layer, SQL agent
+backend/          FastAPI, SQL agent, eval cases
 frontend/         React + Vite UI
-docs/             Architecture notes
+docs/             Architecture + demo notes
 docker-compose.yml
 ```
-
-## Current status
-
-Day 4: SELECT-only validation, LIMIT/timeouts, error-driven retries, and
-structured SQL/rows results from `ask_database` / `scripts.ask`. Next: `/query` API.
 
 ## License
 

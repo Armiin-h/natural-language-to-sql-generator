@@ -4,14 +4,14 @@
 
 AskSQL turns natural-language questions into SQL against a sample SQLite
 database. A LangGraph ReAct agent uses LangChain SQL tools (list tables, schema,
-query, checker) backed by a local Ollama chat model. The FastAPI service exposes
-health/schema today; the query HTTP route lands next.
+query checker, safe query) backed by a local Ollama chat model. FastAPI serves
+health/schema/query endpoints; React renders the SQL and result table.
 
 ```text
 ┌────────────────────┐      JSON       ┌──────────────────────────┐
 │  React (Vite) UI   │ ──────────────► │  FastAPI                 │
-│  AskSQL            │ ◄────────────── │  /health, /schema        │
-│  question + table  │                 │  /query  (Day 5)         │
+│  AskSQL            │ ◄────────────── │  /health /schema /query  │
+│  question + table  │                 │  /examples               │
 └────────────────────┘                 └────────────┬─────────────┘
                                                     │
                      ┌──────────────────────────────┼──────────────────────────────┐
@@ -29,9 +29,15 @@ health/schema today; the query HTTP route lands next.
                      └─────────────────────────────────────────────────────────────┘
 ```
 
-CLI path: `python -m scripts.ask "…"` returns structured success/SQL/rows/error.
+## Request path (`POST /query`)
 
-## Safety (Day 4)
+1. UI posts `{ question }` to `/query`.
+2. API checks Ollama reachability.
+3. `ask_database` runs the ReAct agent (with optional error-driven retries).
+4. `sql_db_query` validates SELECT-only SQL, caps LIMIT, applies timeout.
+5. Response includes `final_sql`, `columns`, `rows`, `answer`, `success`, `error`.
+
+## Safety
 
 | Control | Enforcement |
 |---------|-------------|
@@ -42,30 +48,18 @@ CLI path: `python -m scripts.ask "…"` returns structured success/SQL/rows/erro
 | Timeout | SQLite progress handler + busy_timeout |
 | Retries | Re-invoke agent with prior error (`sql_max_attempts`) |
 
-## Sample schema (Day 2)
+## Sample schema
 
 ```text
 categories 1──* products 1──* order_items *──1 orders *──1 customers
 ```
 
-- Seeded on API startup (`ensure_database`) and via `python -m scripts.init_db`
-- `GET /schema` returns columns, FKs, sample rows, and prompt-ready text
+## Evaluation
 
-## Status
-
-- Day 1: FastAPI `/health`, React shell, Compose stubs
-- Day 2: ORM models, seed data, introspection, `/schema`
-- Day 3: Ollama + LangGraph SQL agent, `scripts/ask.py`
-- Day 4: Code-enforced safety, structured rows, error-driven retries
-
-## Upcoming
-
-| Day | Focus |
-|-----|--------|
-| 5 | `/query` API |
-| 6 | Full query UI |
-| 7 | Execution-accuracy eval |
-| 8 | Compose polish + docs |
+`backend/eval/cases.json` holds labeled questions + gold SQL.
+`python -m scripts.eval_accuracy --gold-only` validates gold queries.
+`python -m scripts.eval_accuracy --agent` scores **execution accuracy**
+(predicted and gold result sets match after normalization).
 
 ## Docker topology
 
@@ -73,3 +67,8 @@ categories 1──* products 1──* order_items *──1 orders *──1 custo
 - `frontend` container: nginx serves the Vite build on `:3000` and proxies
   `/api/*` → `api:8000`.
 - Ollama stays on the host; the API reaches it at `host.docker.internal:11434`.
+
+## Status
+
+Days 1–8 complete: scaffold, sample DB, SQL agent, safety, `/query` API,
+React UI, execution-accuracy eval, docs/CI.
