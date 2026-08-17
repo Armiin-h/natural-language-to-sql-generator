@@ -1,0 +1,247 @@
+[
+  {
+    "id": "count_products",
+    "difficulty": "easy",
+    "category": "aggregate",
+    "question": "How many products are in the catalog?",
+    "gold_sql": "SELECT COUNT(*) AS n FROM products"
+  },
+  {
+    "id": "count_customers",
+    "difficulty": "easy",
+    "category": "aggregate",
+    "question": "How many customers are there?",
+    "gold_sql": "SELECT COUNT(*) AS n FROM customers"
+  },
+  {
+    "id": "count_categories",
+    "difficulty": "easy",
+    "category": "aggregate",
+    "question": "How many product categories exist?",
+    "gold_sql": "SELECT COUNT(*) AS n FROM categories"
+  },
+  {
+    "id": "customers_usa",
+    "difficulty": "easy",
+    "category": "filter",
+    "question": "How many customers live in the USA?",
+    "gold_sql": "SELECT COUNT(*) AS n FROM customers WHERE country = 'USA'"
+  },
+  {
+    "id": "customers_germany",
+    "difficulty": "easy",
+    "category": "filter",
+    "question": "List customer names from Germany",
+    "gold_sql": "SELECT full_name FROM customers WHERE country = 'Germany'"
+  },
+  {
+    "id": "products_electronics",
+    "difficulty": "easy",
+    "category": "join",
+    "question": "List product names in the Electronics category",
+    "gold_sql": "SELECT p.name FROM products p JOIN categories c ON c.id = p.category_id WHERE c.name = 'Electronics' ORDER BY p.name"
+  },
+  {
+    "id": "products_books",
+    "difficulty": "easy",
+    "category": "join",
+    "question": "Which products are in the Books category?",
+    "gold_sql": "SELECT p.name FROM products p JOIN categories c ON c.id = p.category_id WHERE c.name = 'Books' ORDER BY p.name"
+  },
+  {
+    "id": "most_expensive_product",
+    "difficulty": "easy",
+    "category": "order",
+    "question": "What is the most expensive product?",
+    "gold_sql": "SELECT name, unit_price FROM products ORDER BY unit_price DESC LIMIT 1"
+  },
+  {
+    "id": "cheapest_product",
+    "difficulty": "easy",
+    "category": "order",
+    "question": "What is the cheapest product?",
+    "gold_sql": "SELECT name, unit_price FROM products ORDER BY unit_price ASC LIMIT 1"
+  },
+  {
+    "id": "low_stock",
+    "difficulty": "easy",
+    "category": "filter",
+    "question": "Which products have stock quantity under 100?",
+    "gold_sql": "SELECT name, stock_quantity FROM products WHERE stock_quantity < 100 ORDER BY stock_quantity"
+  },
+  {
+    "id": "cancelled_orders",
+    "difficulty": "easy",
+    "category": "filter",
+    "question": "How many orders were cancelled?",
+    "gold_sql": "SELECT COUNT(*) AS n FROM orders WHERE status = 'cancelled'"
+  },
+  {
+    "id": "shipped_orders",
+    "difficulty": "easy",
+    "category": "filter",
+    "question": "How many orders have status shipped?",
+    "gold_sql": "SELECT COUNT(*) AS n FROM orders WHERE status = 'shipped'"
+  },
+  {
+    "id": "completed_orders",
+    "difficulty": "easy",
+    "category": "filter",
+    "question": "How many completed orders are there?",
+    "gold_sql": "SELECT COUNT(*) AS n FROM orders WHERE status = 'completed'"
+  },
+  {
+    "id": "customer_cities",
+    "difficulty": "easy",
+    "category": "projection",
+    "question": "List all customer cities",
+    "gold_sql": "SELECT DISTINCT city FROM customers ORDER BY city"
+  },
+  {
+    "id": "top5_sales",
+    "difficulty": "medium",
+    "category": "join_agg",
+    "question": "Show the top 5 products by sales",
+    "gold_sql": "SELECT p.name AS product, ROUND(SUM(oi.quantity * oi.unit_price), 2) AS sales FROM order_items oi JOIN products p ON p.id = oi.product_id JOIN orders o ON o.id = oi.order_id WHERE o.status != 'cancelled' GROUP BY p.id, p.name ORDER BY sales DESC LIMIT 5"
+  },
+  {
+    "id": "total_revenue",
+    "difficulty": "medium",
+    "category": "join_agg",
+    "question": "What is total revenue excluding cancelled orders?",
+    "gold_sql": "SELECT ROUND(SUM(oi.quantity * oi.unit_price), 2) AS revenue FROM order_items oi JOIN orders o ON o.id = oi.order_id WHERE o.status != 'cancelled'"
+  },
+  {
+    "id": "avg_completed_order_value",
+    "difficulty": "medium",
+    "category": "join_agg",
+    "question": "What is the average order value for completed orders?",
+    "gold_sql": "SELECT ROUND(AVG(order_total), 2) AS avg_order_value FROM (SELECT o.id, SUM(oi.quantity * oi.unit_price) AS order_total FROM orders o JOIN order_items oi ON oi.order_id = o.id WHERE o.status = 'completed' GROUP BY o.id) AS order_totals"
+  },
+  {
+    "id": "orders_by_ava",
+    "difficulty": "medium",
+    "category": "join",
+    "question": "How many orders did Ava Nguyen place?",
+    "gold_sql": "SELECT COUNT(*) AS n FROM orders o JOIN customers c ON c.id = o.customer_id WHERE c.full_name = 'Ava Nguyen'"
+  },
+  {
+    "id": "who_bought_running_shoes",
+    "difficulty": "medium",
+    "category": "join",
+    "question": "Which customers ordered Running Shoes?",
+    "gold_sql": "SELECT DISTINCT c.full_name FROM customers c JOIN orders o ON o.customer_id = c.id JOIN order_items oi ON oi.order_id = o.id JOIN products p ON p.id = oi.product_id WHERE p.name = 'Running Shoes' ORDER BY c.full_name"
+  },
+  {
+    "id": "units_sold_headphones",
+    "difficulty": "medium",
+    "category": "join_agg",
+    "question": "How many Wireless Headphones units were sold excluding cancelled orders?",
+    "gold_sql": "SELECT SUM(oi.quantity) AS units FROM order_items oi JOIN products p ON p.id = oi.product_id JOIN orders o ON o.id = oi.order_id WHERE p.name = 'Wireless Headphones' AND o.status != 'cancelled'"
+  },
+  {
+    "id": "orders_in_march_2025",
+    "difficulty": "medium",
+    "category": "date",
+    "question": "How many orders were placed in March 2025?",
+    "gold_sql": "SELECT COUNT(*) AS n FROM orders WHERE order_date >= '2025-03-01' AND order_date < '2025-04-01'"
+  },
+  {
+    "id": "products_per_category",
+    "difficulty": "medium",
+    "category": "join_agg",
+    "question": "How many products are in each category?",
+    "gold_sql": "SELECT c.name AS category, COUNT(p.id) AS product_count FROM categories c LEFT JOIN products p ON p.category_id = c.id GROUP BY c.id, c.name ORDER BY c.name"
+  },
+  {
+    "id": "customers_with_orders",
+    "difficulty": "medium",
+    "category": "join",
+    "question": "List customers who have placed at least one order",
+    "gold_sql": "SELECT DISTINCT c.full_name FROM customers c JOIN orders o ON o.customer_id = c.id ORDER BY c.full_name"
+  },
+  {
+    "id": "order_item_count",
+    "difficulty": "easy",
+    "category": "aggregate",
+    "question": "How many order line items are there?",
+    "gold_sql": "SELECT COUNT(*) AS n FROM order_items"
+  },
+  {
+    "id": "desk_lamp_stock",
+    "difficulty": "easy",
+    "category": "filter",
+    "question": "What is the stock quantity for Desk Lamp?",
+    "gold_sql": "SELECT stock_quantity FROM products WHERE name = 'Desk Lamp'"
+  },
+  {
+    "id": "emails_canada",
+    "difficulty": "easy",
+    "category": "filter",
+    "question": "What is the email of the customer in Canada?",
+    "gold_sql": "SELECT email FROM customers WHERE country = 'Canada'"
+  },
+  {
+    "id": "sports_product_names",
+    "difficulty": "easy",
+    "category": "join",
+    "question": "List Sports category product names",
+    "gold_sql": "SELECT p.name FROM products p JOIN categories c ON c.id = p.category_id WHERE c.name = 'Sports' ORDER BY p.name"
+  },
+  {
+    "id": "home_product_count",
+    "difficulty": "easy",
+    "category": "join_agg",
+    "question": "How many Home category products are there?",
+    "gold_sql": "SELECT COUNT(*) AS n FROM products p JOIN categories c ON c.id = p.category_id WHERE c.name = 'Home'"
+  },
+  {
+    "id": "max_order_date",
+    "difficulty": "easy",
+    "category": "aggregate",
+    "question": "What is the latest order date?",
+    "gold_sql": "SELECT MAX(order_date) AS latest_order_date FROM orders"
+  },
+  {
+    "id": "min_order_date",
+    "difficulty": "easy",
+    "category": "aggregate",
+    "question": "What is the earliest order date?",
+    "gold_sql": "SELECT MIN(order_date) AS earliest_order_date FROM orders"
+  },
+  {
+    "id": "revenue_by_category",
+    "difficulty": "hard",
+    "category": "join_agg",
+    "question": "Show total sales by category excluding cancelled orders",
+    "gold_sql": "SELECT c.name AS category, ROUND(SUM(oi.quantity * oi.unit_price), 2) AS sales FROM order_items oi JOIN products p ON p.id = oi.product_id JOIN categories c ON c.id = p.category_id JOIN orders o ON o.id = oi.order_id WHERE o.status != 'cancelled' GROUP BY c.id, c.name ORDER BY sales DESC"
+  },
+  {
+    "id": "top_customer_by_spend",
+    "difficulty": "hard",
+    "category": "join_agg",
+    "question": "Which customer spent the most excluding cancelled orders?",
+    "gold_sql": "SELECT c.full_name, ROUND(SUM(oi.quantity * oi.unit_price), 2) AS spend FROM customers c JOIN orders o ON o.customer_id = c.id JOIN order_items oi ON oi.order_id = o.id WHERE o.status != 'cancelled' GROUP BY c.id, c.full_name ORDER BY spend DESC LIMIT 1"
+  },
+  {
+    "id": "items_per_order_avg",
+    "difficulty": "medium",
+    "category": "join_agg",
+    "question": "What is the average number of line items per order?",
+    "gold_sql": "SELECT ROUND(AVG(item_count), 2) AS avg_items FROM (SELECT order_id, COUNT(*) AS item_count FROM order_items GROUP BY order_id) AS per_order"
+  },
+  {
+    "id": "products_never_ordered",
+    "difficulty": "hard",
+    "category": "anti_join",
+    "question": "Which products were never ordered?",
+    "gold_sql": "SELECT p.name FROM products p LEFT JOIN order_items oi ON oi.product_id = p.id WHERE oi.id IS NULL ORDER BY p.name"
+  },
+  {
+    "id": "quantity_sold_by_product",
+    "difficulty": "medium",
+    "category": "join_agg",
+    "question": "Show total quantity sold per product excluding cancelled orders",
+    "gold_sql": "SELECT p.name AS product, SUM(oi.quantity) AS units FROM order_items oi JOIN products p ON p.id = oi.product_id JOIN orders o ON o.id = oi.order_id WHERE o.status != 'cancelled' GROUP BY p.id, p.name ORDER BY units DESC"
+  }
+]
