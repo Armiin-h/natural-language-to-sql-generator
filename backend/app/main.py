@@ -11,9 +11,11 @@ from app.config import get_settings
 from app.db.engine import create_db_engine
 from app.db.introspect import schema_as_dicts, schema_prompt_text
 from app.db.seed import ensure_database, table_row_counts
+from app.routers import query as query_router
 from app.schemas import HealthResponse, SchemaResponse, TableSchema
 
 _engine: Engine | None = None
+APP_VERSION = "1.0.0"
 
 
 def get_engine() -> Engine:
@@ -42,7 +44,7 @@ app = FastAPI(
         "Ask questions in English; a local SQL agent generates and runs "
         "read-only queries against a sample SQLite database."
     ),
-    version="0.4.0",
+    version=APP_VERSION,
     lifespan=lifespan,
 )
 
@@ -53,6 +55,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(query_router.router)
 
 
 @app.get("/health", response_model=HealthResponse)
@@ -65,7 +69,7 @@ def health() -> HealthResponse:
     return HealthResponse(
         status="ok",
         service="nl-to-sql-api",
-        version="0.4.0",
+        version=APP_VERSION,
         ollama_model=settings.ollama_model,
         database=settings.sqlite_path.name,
         sql_row_limit=settings.sql_row_limit,
@@ -92,3 +96,18 @@ def get_schema(
         tables=tables,
         prompt_text=schema_prompt_text(engine, sample_rows=sample_rows),
     )
+
+
+@app.get("/examples")
+def list_examples() -> dict[str, list[str]]:
+    """Example questions for the UI and demos."""
+    return {
+        "examples": [
+            "Show the top 5 products by sales",
+            "How many customers live in the USA?",
+            "List products in the Electronics category",
+            "What is the average order value for completed orders?",
+            "Which customers ordered Running Shoes?",
+            "How many orders were cancelled?",
+        ]
+    }
