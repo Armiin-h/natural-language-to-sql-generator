@@ -1,11 +1,11 @@
 .page {
-  max-width: 720px;
+  max-width: 880px;
   margin: 0 auto;
   padding: 3.5rem 1.5rem 4rem;
 }
 
 .hero {
-  margin-bottom: 2.5rem;
+  margin-bottom: 2rem;
 }
 
 .brand {
@@ -28,18 +28,26 @@
 
 .lede {
   margin: 0;
-  max-width: 34rem;
+  max-width: 38rem;
   color: var(--muted);
   line-height: 1.55;
 }
 
-.status {
+.status,
+.ask,
+.results {
   padding: 1.25rem 1.35rem;
   background: var(--surface);
   border: 1px solid var(--line);
+  margin-bottom: 1.25rem;
 }
 
-.status h2 {
+.status h2,
+.ask h2,
+.results h2,
+.sql-panel h3,
+.answer-panel h3,
+.table-wrap h3 {
   margin: 0 0 1rem;
   font-size: 0.8rem;
   font-weight: 700;
@@ -52,7 +60,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 1rem;
-  margin: 0;
+  margin: 0 0 1rem;
 }
 
 .status-grid dt {
@@ -68,7 +76,7 @@
 }
 
 .status-error {
-  margin: 0;
+  margin: 0.75rem 0 0;
   color: var(--danger);
 }
 
@@ -77,8 +85,121 @@
   color: var(--muted);
 }
 
-.status-grid.counts {
-  margin-top: 1.25rem;
-  padding-top: 1.25rem;
-  border-top: 1px solid var(--line);
+.examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.example {
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--accent) 8%, white);
+  color: var(--ink);
+  padding: 0.45rem 0.7rem;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-align: left;
+}
+
+.example:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+}
+
+.example:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.ask-form textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 5.5rem;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid var(--line);
+  font: inherit;
+  line-height: 1.45;
+  color: var(--ink);
+  background: #fcfffd;
+}
+
+.ask-form textarea:focus {
+  outline: 2px solid color-mix(in srgb, var(--accent) 45%, white);
+  outline-offset: 1px;
+}
+
+.ask-actions {
+  margin-top: 0.85rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.ask-actions button {
+  border: 0;
+  background: var(--accent);
+  color: white;
+  font: inherit;
+  font-weight: 700;
+  padding: 0.7rem 1.15rem;
+  cursor: pointer;
+}
+
+.ask-actions button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.sql-panel pre {
+  margin: 0;
+  padding: 0.9rem 1rem;
+  overflow-x: auto;
+  background: #13261d;
+  color: #e7f6ee;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.answer-panel p {
+  margin: 0;
+  line-height: 1.55;
+}
+
+.table-wrap {
+  margin-top: 1rem;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+th,
+td {
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  padding: 0.55rem 0.45rem;
+  vertical-align: top;
+}
+
+th {
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
